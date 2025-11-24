@@ -1,0 +1,4 @@
+binary-tree-analysis/
+├── BinaryTreeAnalysis.java  # Основной файл с реализацией
+├── README.md               # Документация
+└── .gitignore             # Исключаемые файлы
