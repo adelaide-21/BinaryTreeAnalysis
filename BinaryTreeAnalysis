@@ -1,0 +1,188 @@
+`java
+import java.util.*;
+
+// Узел бинарного дерева
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+    
+    TreeNode(int val) {
+        this.val = val;
+        this.left = null;
+        this.right = null;
+    }
+}
+
+// Основной класс с реализацией всех методов
+public class BinaryTreeAnalysis {
+    
+    // 1. Подсчет количества листьев в бинарном дереве
+    public static int countLeaves(TreeNode root) {
+        if (root == null) return 0;
+        if (root.left == null && root.right == null) return 1;
+        return countLeaves(root.left) + countLeaves(root.right);
+    }
+    
+    // 2. Нахождение глубины бинарного дерева
+    public static int getDepth(TreeNode root) {
+        if (root == null) return 0;
+        return 1 + Math.max(getDepth(root.left), getDepth(root.right));
+    }
+    
+    // 3. Проверка является ли бинарное дерево BST (Binary Search Tree)
+    public static boolean isBST(TreeNode root) {
+        return isBSTUtil(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    
+    private static boolean isBSTUtil(TreeNode node, long min, long max) {
+        if (node == null) return true;
+        if (node.val <= min || node.val >= max) return false;
+        return isBSTUtil(node.left, min, node.val) && 
+               isBSTUtil(node.right, node.val, max);
+    }
+    
+    // 4. Нахождение суммы значений на каждом уровне дерева
+    public static List<Integer> levelSum(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        if (root == null) return result;
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            int levelSum = 0;
+            
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode node = queue.poll();
+                levelSum += node.val;
+                
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+            }
+            
+            result.add(levelSum);
+        }
+        
+        return result;
+    }
+    
+    // 5. Проверка симметрии относительно центра
+    public static boolean isSymmetric(TreeNode root) {
+        if (root == null) return true;
+        return isMirror(root.left, root.right);
+    }
+    
+    private static boolean isMirror(TreeNode left, TreeNode right) {
+        if (left == null && right == null) return true;
+        if (left == null || right == null) return false;
+        return (left.val == right.val) && 
+               isMirror(left.left, right.right) && 
+               isMirror(left.right, right.left);
+    }
+    
+    // 6. Нахождение наименьшего общего предка (LCA)
+    public static TreeNode findLCA(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null  root == p  root == q) return root;
+        
+        TreeNode left = findLCA(root.left, p, q);
+        TreeNode right = findLCA(root.right, p, q);
+        
+        if (left != null && right != null) return root;
+        return left != null ? left : right;
+    }
+    
+    // 7. Нахождение размеров поддеревьев в корневом дереве
+    public static Map<TreeNode, Integer> getSubtreeSizes(TreeNode root) {
+        Map<TreeNode, Integer> sizes = new HashMap<>();
+        calculateSubtreeSize(root, sizes);
+        return sizes;
+    }
+    
+    private static int calculateSubtreeSize(TreeNode node, Map<TreeNode, Integer> sizes) {
+        if (node == null) return 0;
+        
+        int size = 1 + calculateSubtreeSize(node.left, sizes) + 
+                     calculateSubtreeSize(node.right, sizes);
+        sizes.put(node, size);
+        return size;
+
+    // Вспомогательные методы для тестирования
+    public static void printTree(TreeNode root, String prefix, boolean isLeft) {
+        if (root != null) {
+            System.out.println(prefix + (isLeft ? "├── " : "└── ") + root.val);
+            printTree(root.left, prefix + (isLeft ? "│   " : "    "), true);
+            printTree(root.right, prefix + (isLeft ? "│   " : "    "), false);
+        }
+    }
+    
+    // Создание тестового дерева
+    public static TreeNode createTestTree() {
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(3);
+        root.left.left = new TreeNode(4);
+        root.left.right = new TreeNode(5);
+        root.right.left = new TreeNode(6);
+        root.right.right = new TreeNode(7);
+        return root;
+    }
+    
+    // Создание BST для тестирования
+    public static TreeNode createBST() {
+        TreeNode root = new TreeNode(4);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(6);
+        root.left.left = new TreeNode(1);
+        root.left.right = new TreeNode(3);
+        root.right.left = new TreeNode(5);
+        root.right.right = new TreeNode(7);
+        return root;
+    }
+    
+    public static void main(String[] args) {
+        System.out.println("=== АНАЛИЗ БИНАРНЫХ ДЕРЕВЬЕВ ===\n");
+        
+        // Тестирование на обычном бинарном дереве
+        TreeNode tree1 = createTestTree();
+        System.out.println("Дерево 1:");
+        printTree(tree1, "", true);
+        
+        System.out.println("\n--- Результаты для Дерева 1 ---");
+        System.out.println("1. Количество листьев: " + countLeaves(tree1));
+        System.out.println("2. Глубина дерева: " + getDepth(tree1));
+        System.out.println("3. Является BST: " + isBST(tree1));
+        System.out.println("4. Суммы по уровням: " + levelSum(tree1));
+        System.out.println("5. Симметрично: " + isSymmetric(tree1));
+        
+        // Тестирование на BST
+        TreeNode tree2 = createBST();
+        System.out.println("\nДерево 2 (BST):");
+        printTree(tree2, "", true);
+        
+        System.out.println("\n--- Результаты для Дерева 2 (BST) ---");
+        System.out.println("1. Количество листьев: " + countLeaves(tree2));
+        System.out.println("2. Глубина дерева: " + getDepth(tree2));
+        System.out.println("3. Является BST: " + isBST(tree2));
+        System.out.println("4. Суммы по уровням: " + levelSum(tree2));
+        System.out.println("5. Симметрично: " + isSymmetric(tree2));
+        
+        // Тестирование LCA
+        TreeNode lca = findLCA(tree1, tree1.left.left, tree1.left.right);
+        System.out.println("\n6. LCA для узлов 4 и 5: " + (lca != null ? lca.val : "null"));
+        
+        // Тестирование размеров поддеревьев
+        Map<TreeNode, Integer> sizes = getSubtreeSizes(tree1);
+        System.out.println("\n7. Размеры поддеревьев:");
+        printSubtreeSizes(tree1, sizes, "");
+    }
+    
+    private static void printSubtreeSizes(TreeNode node, Map<TreeNode, Integer> sizes, String prefix) {
+        if (node != null) {
+            System.out.println(prefix + "Узел " + node.val + ": размер = " + sizes.get(node));
+            printSubtreeSizes(node.left, sizes, prefix + "  ");
+            printSubtreeSizes(node.right, sizes, prefix + "  ");
+        }
+    }
+}
